@@ -1,0 +1,5 @@
+discord.py==1.5.0
+discord==1.0.1
+-i https://github.com/eunwoo1104/discord-py-slash-command
+discord_py_slash_command
+
