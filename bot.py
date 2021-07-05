@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import re
 import json
 import os
 import sys
@@ -15,20 +16,40 @@ TOKEN = "REPLACE_THIS"
 client = commands.Bot(intents=discord.Intents.all(), command_prefix="!")
 slash = SlashCommand(client, sync_commands=True, sync_on_cog_reload= True) # Declares slash commands through the client.
 guild_ids= [REPLACE_THIS]
-
+admin_role_id = [REPLACE THIS]
 @client.event
 async def on_ready():
     print("Ready!")
 
-@slash.slash(name="reload", description="Reloads all commands.", guild_ids=guild_ids)
+@slash.slash(name="reload", description="[ADMIN ONLY] Reloaduj komande.", guild_ids=guild_ids)
+@slash.permission(guild_id=guild_ids[0], permissions=[create_permission(admin_role_id, SlashCommandPermissionType.ROLE, True), create_permission(guild_ids[0], SlashCommandPermissionType.ROLE, False)])
 async def function(ctx):
     await ctx.send(f"Reloadano {len(os.listdir('./cogs'))} komandi.", hidden= True)
     os.execv(sys.executable, ['python'] + sys.argv)
+
+@slash.slash(name="list", description="Lista komandi.", guild_ids=guild_ids)
+async def function(ctx):
+    embed=discord.Embed(title="Lista Komandi", description="Komande koje mozete koristiti su:", color=0x34c5ef)
+    embed.set_thumbnail(url="https://i.imgur.com/Ogtw9Xo.png")
+    information = {}
+    for j in pathlib.Path('./cogs').iterdir():
+        if j.is_file():
+            with open(j, "r") as fuck:
+                try:
+                    information[str(j)[5:-3]] = str(re.findall('(?<=description=").*(?<=")', fuck.read())[0])[:-1]
+                except:
+                    information[str(j)[5:-3]] = "empty"
+    del information["default"]
+    for key, desc in information.items():
+        embed.add_field(name=key, value=desc, inline=True)
+    embed.set_footer(text="https://github.com/omznc/discord-custom-slashes/")
+    await ctx.send(embed=embed, hidden=True)
         
-@slash.slash(name="command", description="Manipuliraj komandama | Add treba sve parametre, Remove treba name, List ne treba nista.", guild_ids=guild_ids, options=[
+@slash.permission(guild_id=guild_ids[0], permissions=[create_permission(admin_role_id, SlashCommandPermissionType.ROLE, True), create_permission(guild_ids[0], SlashCommandPermissionType.ROLE, False)])
+@slash.slash(name="command", description="[ADMIN ONLY] Manipuliraj komandama | Add i Edit trebaju sve parametre a Remove treba name.", guild_ids=guild_ids, options=[
                create_option(
                  name="operator",
-                 description="Add, Remove, List",
+                 description="Add, Remove, ili Edit",
                  option_type=3,
                  required=True,
                  choices=[
@@ -41,10 +62,6 @@ async def function(ctx):
                     value="Remove"
                   ),
                   create_choice(
-                    name="list",
-                    value="List"
-                  ),
-                  create_choice(
                     name= "edit",
                     value= "Edit")
                 ]
@@ -53,6 +70,7 @@ async def function(ctx):
                create_option(name="send", description="Output komande",option_type=3, required=False),
                create_option(name="description", description="Opis komande | Ovo je vidljivo kada neko napise /imeovekomande",option_type=3, required=False)
              ])
+@slash.permission(guild_id=guild_ids[0], permissions=[create_permission(admin_role_id, SlashCommandPermissionType.ROLE, True), create_permission(guild_ids[0], SlashCommandPermissionType.ROLE, False)])
 async def edit(ctx: SlashContext, operator:str, name=None, send=None, description=None):
     print(operator)
     if operator == "Edit":
@@ -66,7 +84,7 @@ async def edit(ctx: SlashContext, operator:str, name=None, send=None, descriptio
                 data[11] = f'       await ctx.send("{send}") \n'
             with open(f'./cogs/{name}.py', 'r+') as f:
                 f.writelines(data)
-            await ctx.send(f'Komanda `{name}` editovana.', hidden=True)
+            await ctx.send(f'Komanda `{name}` editovana.', hidden= True)
             os.execv(sys.executable, ['python'] + sys.argv)
             
     if operator == "Add":
@@ -99,16 +117,7 @@ async def edit(ctx: SlashContext, operator:str, name=None, send=None, descriptio
                 os.execv(sys.executable, ['python'] + sys.argv)
             except Exception as E:
                 await ctx.send(f"Komanda ne postoji.", hidden= True)
-    if operator == "List":
-        f = []
-        for p in pathlib.Path('./cogs').iterdir():
-            if p.is_file():
-                f.append(p)
-        f = [str(e) for e in f]
-        f = [e[5:-3] for e in f]
-        f.remove('default')
-        output = "`"+"`, `".join(f) +"`"
-        await ctx.send(f"Lista svih komandi: {output}", hidden= True)
+
         
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py') and not filename.startswith('default'):
