@@ -5,7 +5,7 @@
 
 This is a bot for our university server that ties in together with my scraping bot to provide custom, user generatable, editable, and removable slash commands.
 Now, this could break at any time as this pip library is probably not going to be supported once discord.py rewrite hits version 2.0, but hey, I'm inpatient.
-It saves the commands as cogs located in `/cogs` and relaods them on any modification. It should work flawlessly.
+It saves the commands as cogs located in `/cogs` and reloads them on any modification. It should work flawlessly.
 
 ## If for some reason you want to use it, this is how.
 
