@@ -34,9 +34,9 @@ async def function(ctx):
     information = {}
     for j in pathlib.Path('./cogs').iterdir():
         if j.is_file():
-            with open(j, "r") as fuck:
+            with open(j, "r") as command:
                 try:
-                    information[str(j)[5:-3]] = str(re.findall('(?<=description=").*(?<=")', fuck.read())[0])[:-1]
+                    information[str(j)[5:-3]] = str(re.findall('(?<=description=").*(?<=")', command.read())[0])[:-1]
                 except:
                     information[str(j)[5:-3]] = "empty"
     del information["default"]
