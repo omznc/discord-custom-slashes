@@ -1,4 +1,4 @@
-# Custom slash commands - The bot
+# Custom slash commands - The bot 💀
 
 <a href="https://discord.gg/vZRrpBXFNT"><img src="https://img.shields.io/discord/787773373748740128?label=Discord%20Server&style=for-the-badge"></img></a>
 <br><br>
